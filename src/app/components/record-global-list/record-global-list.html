@@ -1,0 +1,23 @@
+<div class="container">  
+    @if (isFormVisible) {  
+      <div class="modal-overlay" (click)="handleCancel()">
+        <div class="modal-window" (click)="$event.stopPropagation()">
+          <app-record-form
+            [recordToEdit]="currentRecord"
+            (saveFormEmitter)="handleSaveRecord($event)"
+            (cancelFormEmitter)="handleCancel()">
+          </app-record-form>
+        </div>
+      </div>
+    }
+
+    <app-record-list 
+      [records]="records" 
+      [exercises]="exercises"
+      (addRecordEmitter)="handleAddRecord()"
+      (editRecordEmitter)="handleEditRecord($event)"
+      (removeRecordEmiter)="handleDeleteRecord($event)"
+      (sortChangeEmitter)="handleSortChange($event)"
+      (filterChangeEmitter)="handleFilterChange($event)">
+    </app-record-list>
+  </div>

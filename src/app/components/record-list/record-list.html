@@ -1,0 +1,62 @@
+<div class="list-container">
+  <div class="list-header">
+    <h2>Record Salvati</h2>
+    <div class="header-controls">
+      <button class="add-record-btn" (click)="addRecordEmitter.emit()">+ Aggiungi Record</button>
+    </div>
+  </div>
+  <div class="filter-container">
+    <form #filterForm="ngForm" (change)="onFilterChange()">
+      <div class="form-group">
+        <label for="exercise">Exercise</label>
+        <select id="exercise" name="exercise" [(ngModel)]="filterByExerciseId">
+          <option [ngValue]="null">All</option>
+          @for(exercise of exercises; track exercise.id) {
+            <option [value]="exercise.id">{{ exercise.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="fromDate">From</label>
+        <input type="date" id="fromDate" name="fromDate" [(ngModel)]="filterByFromDate">
+      </div>
+      <div class="form-group">
+        <label for="toDate">To</label>
+        <input type="date" id="toDate" name="toDate" [(ngModel)]="filterByToDate">
+      </div>
+    </form>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th (click)="onSort('date')" class="sortable">
+          Data
+          @if(currentSortField === 'date') {
+            <span>{{ currentSortDirection === 'asc' ? '↑' : '↓' }}</span>
+          }
+        </th>
+        <th (click)="onSort('exercise')" class="sortable">
+          Esercizio
+          @if(currentSortField === 'exercise') {
+            <span>{{ currentSortDirection === 'asc' ? '↑' : '↓' }}</span>
+          }
+        </th>
+        <th>Peso (kg)</th>
+        <th>%</th>
+        <th>Azioni</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let record of records">
+        <td>{{ record.date | date: 'dd/MM/yyyy' }}</td>
+        <td>{{ record.exercise.name }}</td>
+        <td>{{ record.weight }}</td>
+        <td>{{ record.percentage }}</td>
+        <td class="actions">
+          <button (click)="editRecordEmitter.emit(record)">Modifica</button>
+          <button class="delete" (click)="removeRecordEmiter.emit(record.id)">Elimina</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

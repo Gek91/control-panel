@@ -1,0 +1,28 @@
+<div class="form-container">
+    <h2>{{ isEditing ? 'Modifica Record' : 'Aggiungi Nuovo Record' }}</h2>
+    <form [formGroup]="recordForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="date">Data</label>
+        <input id="date" type="date" formControlName="date">
+      </div>
+      <div class="form-group">
+        <label for="exerciseId">Esercizio</label>
+        <select id="exerciseId" formControlName="exerciseId">
+          <option value="">Seleziona un esercizio</option>
+          <option *ngFor="let exercise of exercises" [value]="exercise.id">{{ exercise.name }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="weight">Peso (kg)</label>
+        <input id="weight" type="number" formControlName="weight" placeholder="100">
+      </div>
+      <div class="form-group">
+        <label for="percentage">Percentuale (%)</label>
+        <input id="percentage" type="number" formControlName="percentage">
+      </div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="recordForm.invalid">{{ isEditing ? 'Aggiorna' : 'Aggiungi' }}</button>
+        <button type="button" (click)="onCancel()">Annulla</button>
+      </div>
+    </form>
+  </div>

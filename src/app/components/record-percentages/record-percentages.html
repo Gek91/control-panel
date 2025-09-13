@@ -1,0 +1,36 @@
+<div class="details-container">
+      <h2>Exercise Percentages</h2>
+        <div class="filter-container">
+            <form #filterForm="ngForm" (change)="loadPercentagesTable()">
+            <div class="form-group">
+                <label for="exercise">Exercise</label>
+                <select id="exercise" name="exercise" [(ngModel)]="exerciseId">
+                @for(exercise of exercises; track exercise.id) {
+                    <option [value]="exercise.id">{{ exercise.name }}</option>
+                }
+                </select>
+            </div>
+            </form>
+        </div>
+        <div class="content-wrapper">
+            <div class="list-container">
+            <h3>Records</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>Percentage</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                @for(percentage of percentages; track percentage.percentage) {
+                    <tr>
+                    <td>{{ percentage.percentage }}</td>
+                    <td>{{ percentage.value }}</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            </div>
+        </div>
+</div>

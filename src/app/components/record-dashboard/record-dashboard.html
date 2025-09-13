@@ -1,0 +1,45 @@
+<div class="details-container">
+  <h2>Exercise Dashboard</h2>
+  <div class="filter-container">
+    <form #filterForm="ngForm" (change)="loadRecordsForExercise()">
+      <div class="form-group">
+        <label for="exercise">Exercise</label>
+        <select id="exercise" name="exercise" [(ngModel)]="exerciseId">
+          @for(exercise of exercises; track exercise.id) {
+            <option [value]="exercise.id">{{ exercise.name }}</option>
+          }
+        </select>
+      </div>
+    </form>
+  </div>
+  <div class="content-wrapper">
+    <div class="list-container">
+      <h3>Records</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Weight (kg)</th>
+            <th>Percentage</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(record of records; track record.id) {
+            <tr>
+              <td>{{ record.date | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ record.weight }}</td>
+              <td>{{ record.percentage }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="chart-container">
+      <canvas baseChart
+        [data]="lineChartData"
+        [options]="lineChartOptions"
+        [type]="lineChartType">
+      </canvas>
+    </div>
+  </div>
+</div>
