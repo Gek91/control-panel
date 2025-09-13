@@ -1,49 +1,36 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, SimpleChanges, OnChanges, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Record } from '../../models/record';
 import { Exercise } from '../../models/exercise';
 import { ExerciseService } from '../../services/exercises-service';
 import { DatePipe, CommonModule } from '@angular/common';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatButtonModule } from '@angular/material/button';
 
 
 @Component({
   selector: 'app-record-form',
-  imports: [
-    ReactiveFormsModule, 
-    CommonModule, 
-    MatDialogModule, 
-    MatFormFieldModule, 
-    MatInputModule, 
-    MatSelectModule, 
-    MatDatepickerModule, 
-    MatNativeDateModule, 
-    MatButtonModule
-  ],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './record-form.html',
   styleUrl: './record-form.scss',
   standalone: true,
   providers: [DatePipe]
 })
-export class RecordForm implements OnInit {
+export class RecordForm implements OnChanges, OnInit {
 
+  @Input() recordToEdit: Record | null = null;
+  @Output() saveFormEmitter = new EventEmitter<Record>();
+  @Output() cancelFormEmitter = new EventEmitter<void>();
+  
   recordForm: FormGroup;
   isEditing = false;
+  currentRecordId: string | null = null;
   exercises: Exercise[] = [];
 
   constructor(
     private fb: FormBuilder,
     private datePipe: DatePipe,
-    private exerciseService: ExerciseService,
-    public dialogRef: MatDialogRef<RecordForm>,
-    @Inject(MAT_DIALOG_DATA) public data: { recordToEdit: Record | null, exercises: Exercise[] }
+    private exerciseService: ExerciseService
   ) {
+    // Inizializza il form
     const today = datePipe.transform(new Date(), 'yyyy-MM-dd');
     this.recordForm = this.fb.group({
       date: [today, Validators.required],
@@ -51,21 +38,16 @@ export class RecordForm implements OnInit {
       weight: ['', [Validators.required, Validators.min(1)]],
       percentage: [100, [Validators.required, Validators.min(1), Validators.max(100)]]
     });
-
-    if (this.data.recordToEdit) {
-      this.isEditing = true;
-      const formattedDate = new Date(this.data.recordToEdit.date).toISOString().substring(0, 10);
-      this.recordForm.setValue({
-        date: formattedDate,
-        exerciseId: this.data.recordToEdit.exercise.id,
-        weight: this.data.recordToEdit.weight,
-        percentage: this.data.recordToEdit.percentage
-      });
-    }
   }
 
   ngOnInit(): void {
-    this.exercises = this.data.exercises;
+    this.loadExercises();
+  }
+
+  loadExercises(): void {
+    this.exerciseService.getExercises().subscribe(data => {
+      this.exercises = data;
+    });
   }
 
   onSubmit(): void {
@@ -79,21 +61,58 @@ export class RecordForm implements OnInit {
       return;
     }
     
+    // Prepara i dati del record con l'oggetto Exercise
     const recordData = {
       ...formValue,
       date: new Date(formValue.date),
       exercise: selectedExercise
     };
     
-    const recordToSave = this.isEditing && this.data.recordToEdit
-      ? { ...recordData, id: this.data.recordToEdit.id }
+    // Se siamo in modifica, aggiungiamo l'ID altrimenti inviamo solo i dati del form.
+    const recordToSave = this.isEditing && this.recordToEdit
+      ? { ...recordData, id: this.recordToEdit.id }
       : recordData;
       
-    this.dialogRef.close(recordToSave);
+    // Emette l'evento 'save' con i dati, notificando il genitore.
+    this.saveFormEmitter.emit(recordToSave);
+  }
+
+  //activate when input changes
+  ngOnChanges(changes: SimpleChanges): void {
+    // Se il genitore ci ha passato un 'recordToEdit'...
+    if (changes['recordToEdit'] && this.recordToEdit) {
+      // ...allora siamo in modalità modifica.
+      this.isEditing = true;
+      // Formatta la data per l'input type="date" (YYYY-MM-DD)
+      const formattedDate = new Date(this.recordToEdit.date).toISOString().substring(0, 10);
+      // E popoliamo il form con i dati ricevuti.
+      this.recordForm.setValue({
+        date: formattedDate,
+        exerciseId: this.recordToEdit.exercise.id,
+        weight: this.recordToEdit.weight,
+        percentage: this.recordToEdit.percentage
+      });
+    } else {
+      // Altrimenti, siamo in modalità creazione.
+      this.isEditing = false;
+      // Reset del form per la creazione di un nuovo record
+      this.resetForm();
+    }
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    // Emette l'evento 'cancel', notificando il genitore.
+    this.cancelFormEmitter.emit();
   }
-}
 
+  private resetForm(): void {
+    const today = this.datePipe.transform(new Date(), 'yyyy-MM-dd');
+    this.recordForm.reset({
+      date: today,
+      exercise: '',
+      weight: '',
+      percentage: 100
+    });
+  }
+
+}
