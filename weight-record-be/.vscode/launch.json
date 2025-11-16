@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Microservice Development",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/run.py",
+            "env": {
+                // adjust pythonpath for local module 
+                "PYTHONPATH": "${workspaceFolder}/app" 
+            },
+            "envFile": "${workspaceFolder}/.env.local",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ]
+}
