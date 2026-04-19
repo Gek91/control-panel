@@ -1,5 +1,6 @@
 @use '@angular/material' as mat;
 @import 'styles/variables';
+@import './app/main/module-shell';
 
 html {
   @include mat.theme((

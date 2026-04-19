@@ -7,12 +7,30 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChartConfiguration, ChartOptions, ChartType } from 'chart.js';
 import { Exercise } from '../../models/exercise';
 import { ExerciseService } from '../../services/exercises-service';
-
+import {
+  ModuleContentRow,
+  ModuleDetail,
+  ModuleFilter,
+  ModulePanel,
+  ModuleTable,
+  ModuleWideCol,
+} from '../../../main/components';
 
 @Component({
   selector: 'app-record-dashboard',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective, FormsModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    BaseChartDirective,
+    FormsModule,
+    ReactiveFormsModule,
+    ModuleContentRow,
+    ModuleDetail,
+    ModuleFilter,
+    ModulePanel,
+    ModuleTable,
+    ModuleWideCol,
+  ],
   templateUrl: './record-dashboard.html',
   styleUrls: ['./record-dashboard.scss'],
   providers: [provideCharts(withDefaultRegisterables())],

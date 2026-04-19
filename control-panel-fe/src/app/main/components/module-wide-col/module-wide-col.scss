@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  flex: 2 1 400px;
+  min-width: min(100%, 280px);
+  margin-bottom: 2rem;
+}
+
+.chart-slot {
+  width: 100%;
+  min-height: 320px;
+  position: relative;
+}

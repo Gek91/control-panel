@@ -1,8 +1,10 @@
+// Stile condiviso (classi app-mod-*): src/app/main/_module-shell.scss
+
 .news-layout {
   display: grid;
   grid-template-columns: minmax(17rem, 22rem) 1fr;
   gap: 1.5rem;
-  padding: 1.5rem 2rem 2rem;
+  margin-top: 1.5rem;
   box-sizing: border-box;
   align-items: start;
 }
@@ -12,12 +14,8 @@
   top: 80px;
 }
 
-.feed-card mat-card-header {
-  margin-bottom: 0.5rem;
-}
-
-.feed-card mat-card-title {
-  font-size: 1.1rem;
+.feed-panel app-module-panel {
+  display: block;
 }
 
 .feed-category {
@@ -45,67 +43,43 @@
   min-width: 0;
 }
 
-.news-list-header {
+.news-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
   margin-bottom: 1rem;
+  padding: 0.25rem 0.25rem 0.75rem;
+}
 
-  h1 {
-    font-size: 1.75rem;
-    font-weight: 500;
-    margin: 0 0 0.35rem;
+.news-counts {
+  font-size: 0.95rem;
+  color: #333;
+
+  strong {
+    color: #007bff;
+    font-weight: 600;
   }
 }
 
-.lede {
+.empty-message {
   margin: 0;
-  opacity: 0.85;
-  font-size: 0.95rem;
-}
-
-.empty-card p {
-  margin: 0;
-}
-
-.table-card {
-  padding: 0;
-}
-
-.table-wrap {
-  overflow-x: auto;
 }
 
 .news-table {
-  width: 100%;
-  border-collapse: collapse;
   font-size: 0.9rem;
-
-  th,
-  td {
-    text-align: left;
-    padding: 0.65rem 1rem;
-    vertical-align: top;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  }
-
-  th {
-    font-weight: 500;
-    background: rgba(0, 0, 0, 0.03);
-    white-space: nowrap;
-  }
-
-  tbody tr:last-child td {
-    border-bottom: none;
-  }
 }
 
 .news-row {
   cursor: pointer;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.04);
+    background-color: #e9ecef;
   }
 
   &:focus-visible {
-    outline: 2px solid rgba(103, 58, 183, 0.55);
+    outline: 2px solid rgba(0, 123, 255, 0.45);
     outline-offset: -2px;
   }
 
@@ -113,11 +87,25 @@
     cursor: default;
 
     &:hover {
-      background: transparent;
+      background-color: transparent;
     }
 
     &:focus-visible {
       outline: none;
+    }
+  }
+
+  &--read {
+    color: #8a8a8a;
+
+    .col-title {
+      font-weight: 400;
+    }
+
+    .col-summary,
+    .col-feed,
+    .col-date {
+      color: #8a8a8a;
     }
   }
 }
@@ -125,7 +113,7 @@
 .col-date {
   white-space: nowrap;
   width: 1%;
-  color: rgba(0, 0, 0, 0.65);
+  color: #616161;
 }
 
 .col-title {
@@ -139,8 +127,53 @@
 }
 
 .col-summary {
-  color: rgba(0, 0, 0, 0.75);
+  color: #333;
   max-width: 28rem;
+}
+
+.col-actions-head,
+.col-actions {
+  width: 1%;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.col-actions {
+  padding: 0 0.25rem;
+}
+
+.mark-read-btn {
+  color: #616161;
+
+  &:hover {
+    color: #007bff;
+  }
+}
+
+.news-row--read .mark-read-btn {
+  color: #007bff;
+}
+
+.unread-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: #007bff;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @media (max-width: 900px) {

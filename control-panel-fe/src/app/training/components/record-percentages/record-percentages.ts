@@ -5,11 +5,27 @@ import { RecordService } from '../../services/records-service';
 import { PercentageValue } from '../../models/record';
 import { Exercise } from '../../models/exercise';
 import { ExerciseService } from '../../services/exercises-service';
+import {
+  ModuleContentRow,
+  ModuleDetail,
+  ModuleFilter,
+  ModulePanel,
+  ModuleTable,
+} from '../../../main/components';
 
 @Component({
   selector: 'app-record-percentages',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ModuleContentRow,
+    ModuleDetail,
+    ModuleFilter,
+    ModulePanel,
+    ModuleTable,
+  ],
   templateUrl: './record-percentages.html',
   styleUrls: ['./record-percentages.scss'],
 })

@@ -87,16 +87,24 @@ const NEWS: NewsItem[] = [
   },
 ];
 
+export interface GetNewsOptions {
+  /** Se true, restituisce solo le news non ancora lette. */
+  onlyUnread?: boolean;
+}
+
+/**
+ * Service di accesso ai dati news. Mock dell'API che sarà esposta dal backend:
+ * lo stato di lettura è gestito qui internamente (lato "server") e non viene
+ * persistito sul frontend. Il componente deve solo chiamare i metodi del
+ * service e usare il flag `read` presente sui `NewsItem` restituiti.
+ */
 @Injectable({ providedIn: 'root' })
 export class NewsDataService {
+  // Stato lato "backend" mockato: id delle news marcate come lette.
+  private readonly readIds = new Set<string>();
+
   getCategories(): FeedCategory[] {
     return CATEGORIES;
-  }
-
-  getNews(): NewsItem[] {
-    return [...NEWS].sort(
-      (a, b) => b.publishedAt.getTime() - a.publishedAt.getTime(),
-    );
   }
 
   getFeedNameById(feedId: string): string {
@@ -105,5 +113,25 @@ export class NewsDataService {
       if (f) return f.name;
     }
     return feedId;
+  }
+
+  /**
+   * Restituisce la lista di news ordinate per data discendente, con il flag
+   * `read` valorizzato. Se `onlyUnread` è true il filtro è applicato lato
+   * "backend" (verrà mappato sul corrispondente parametro HTTP).
+   */
+  async getNews(opts: GetNewsOptions = {}): Promise<NewsItem[]> {
+    const items = NEWS.map<NewsItem>((n) => ({ ...n, read: this.readIds.has(n.id) }));
+    items.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+    return opts.onlyUnread ? items.filter((n) => !n.read) : items;
+  }
+
+  /** Marca una news come letta o non letta lato backend. */
+  async markRead(id: string, read: boolean): Promise<void> {
+    if (read) {
+      this.readIds.add(id);
+    } else {
+      this.readIds.delete(id);
+    }
   }
 }

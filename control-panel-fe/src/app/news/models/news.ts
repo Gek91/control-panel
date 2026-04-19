@@ -17,4 +17,6 @@ export interface NewsItem {
   feedId: string;
   /** Link all'articolo originale sul sito della fonte (es. da RSS). */
   externalUrl?: string;
+  /** Stato lettura locale: true se l'utente ha aperto/segnato la news come letta. */
+  read?: boolean;
 }

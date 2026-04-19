@@ -4,11 +4,11 @@ import { Record } from '../../models/record';
 import { Exercise } from '../../models/exercise';
 import { ExerciseService } from '../../services/exercises-service';
 import { DatePipe, CommonModule } from '@angular/common';
-
+import { ModulePanel } from '../../../main/components';
 
 @Component({
   selector: 'app-record-form',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, ModulePanel],
   templateUrl: './record-form.html',
   styleUrl: './record-form.scss',
   standalone: true,

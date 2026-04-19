@@ -1,14 +1,35 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import {
+  ModulePageHeader,
+  ModulePanel,
+  ModulePanelHeader,
+  ModuleTable,
+} from '../main/components';
 import { FeedCategory, NewsItem } from './models/news';
 import { NewsDataService } from './services/news-data.service';
 
 @Component({
   selector: 'app-news-page',
-  imports: [DatePipe, MatCardModule, MatCheckboxModule, MatDividerModule],
+  imports: [
+    DatePipe,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatDividerModule,
+    MatIconModule,
+    MatSlideToggleModule,
+    MatTooltipModule,
+    ModulePageHeader,
+    ModulePanel,
+    ModulePanelHeader,
+    ModuleTable,
+  ],
   templateUrl: './news-page.html',
   styleUrl: './news-page.scss',
   standalone: true,
@@ -17,15 +38,30 @@ export class NewsPage {
   private readonly newsData = inject(NewsDataService);
 
   protected readonly categories = this.newsData.getCategories();
-  private readonly allNews = this.newsData.getNews();
   protected readonly feedLabels = this.buildFeedLabels();
 
   protected readonly enabledFeedIds = signal<Set<string>>(this.allFeedIds());
+  protected readonly showOnlyUnread = signal(false);
 
-  protected readonly filteredNews = computed(() => {
+  // Cache locale della risposta del backend. Lo stato di lettura non vive
+  // sul FE: ogni cambio (filtro o mark read) ricarica la lista dal service.
+  private readonly newsCache = signal<NewsItem[]>([]);
+  protected readonly loading = signal(false);
+
+  protected readonly displayedNews = computed(() => {
     const allowed = this.enabledFeedIds();
-    return this.allNews.filter((n) => allowed.has(n.feedId));
+    return this.newsCache().filter((n) => allowed.has(n.feedId));
   });
+
+  protected readonly unreadCount = computed(
+    () => this.displayedNews().filter((n) => !n.read).length,
+  );
+
+  protected readonly totalCount = computed(() => this.displayedNews().length);
+
+  constructor() {
+    void this.reloadNews();
+  }
 
   protected feedName(feedId: string): string {
     return this.feedLabels.get(feedId) ?? this.newsData.getFeedNameById(feedId);
@@ -65,24 +101,56 @@ export class NewsPage {
     this.enabledFeedIds.set(next);
   }
 
+  protected async setShowOnlyUnread(value: boolean): Promise<void> {
+    this.showOnlyUnread.set(value);
+    await this.reloadNews();
+  }
+
   protected hasArticleLink(item: NewsItem): boolean {
     return Boolean(item.externalUrl?.trim());
   }
 
   protected articleRowAriaLabel(item: NewsItem): string {
+    const readState = item.read ? 'già letta' : 'non letta';
     return this.hasArticleLink(item)
-      ? `Apri articolo in nuova scheda: ${item.title}`
-      : `${item.title} (nessun link disponibile)`;
+      ? `Apri articolo in nuova scheda: ${item.title} (${readState})`
+      : `${item.title} (${readState}, nessun link disponibile)`;
   }
 
-  protected openArticle(item: NewsItem): void {
+  protected markReadAriaLabel(item: NewsItem): string {
+    return item.read
+      ? `Segna come non letta: ${item.title}`
+      : `Segna come letta: ${item.title}`;
+  }
+
+  protected async toggleRead(item: NewsItem, event: Event): Promise<void> {
+    event.stopPropagation();
+    await this.newsData.markRead(item.id, !item.read);
+    await this.reloadNews();
+  }
+
+  protected async openArticle(item: NewsItem): Promise<void> {
     const url = item.externalUrl?.trim();
     if (!url) return;
+    if (!item.read) {
+      await this.newsData.markRead(item.id, true);
+      await this.reloadNews();
+    }
     const a = document.createElement('a');
     a.href = url;
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
     a.click();
+  }
+
+  private async reloadNews(): Promise<void> {
+    this.loading.set(true);
+    try {
+      const list = await this.newsData.getNews({ onlyUnread: this.showOnlyUnread() });
+      this.newsCache.set(list);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   private allFeedIds(): Set<string> {

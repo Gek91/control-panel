@@ -1,11 +1,17 @@
-<div class="news-layout">
-  <aside class="feed-panel" aria-labelledby="feed-filter-title">
-    <mat-card class="feed-card">
-      <mat-card-header>
-        <mat-card-title id="feed-filter-title">Fonti (feed)</mat-card-title>
-        <mat-card-subtitle>Abilita categorie o singoli feed per filtrare la lista</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
+<div class="container">
+  <app-module-page-header
+    title="News"
+    subtitle="Articoli dai feed attivi, ordinati per data."
+  />
+
+  <div class="news-layout">
+    <aside class="feed-panel" aria-labelledby="feed-filter-title">
+      <app-module-panel [noMargin]="true">
+        <app-module-panel-header
+          title="Fonti (feed)"
+          description="Abilita categorie o singoli feed per filtrare la lista"
+          titleId="feed-filter-title"
+        />
         @for (cat of categories; track cat.id) {
           <section class="feed-category" [attr.aria-label]="'Categoria ' + cat.name">
             <mat-checkbox
@@ -33,38 +39,56 @@
             }
           </section>
         }
-      </mat-card-content>
-    </mat-card>
-  </aside>
+      </app-module-panel>
+    </aside>
 
-  <section class="news-list-panel" aria-label="Elenco news">
-    <header class="news-list-header">
-      <h1>News</h1>
-      <p class="lede">Articoli dai feed attivi, ordinati per data.</p>
-    </header>
+    <section class="news-list-panel" aria-label="Elenco news">
+      <div class="news-toolbar" role="group" aria-label="Filtri lista news">
+        <span class="news-counts" aria-live="polite">
+          @if (showOnlyUnread()) {
+            <strong>{{ totalCount() }}</strong> news non lette
+          } @else {
+            <strong>{{ unreadCount() }}</strong> non lette su {{ totalCount() }}
+          }
+        </span>
+        <mat-slide-toggle
+          [checked]="showOnlyUnread()"
+          [disabled]="loading()"
+          (change)="setShowOnlyUnread($event.checked)"
+        >
+          Solo non lette
+        </mat-slide-toggle>
+      </div>
 
-    @if (filteredNews().length === 0) {
-      <mat-card class="empty-card">
-        <mat-card-content>
-          <p>Nessuna news: seleziona almeno un feed nella colonna a sinistra.</p>
-        </mat-card-content>
-      </mat-card>
-    } @else {
-      <mat-card class="table-card">
-        <div class="table-wrap">
-          <table class="news-table">
+      @if (displayedNews().length === 0) {
+        <app-module-panel>
+          <p class="empty-message">
+            @if (showOnlyUnread()) {
+              Nessuna news non letta: disattiva il filtro per vedere tutte le news.
+            } @else {
+              Nessuna news: seleziona almeno un feed nella colonna a sinistra.
+            }
+          </p>
+        </app-module-panel>
+      } @else {
+        <app-module-panel [flush]="true">
+          <app-module-table extraTableClass="news-table">
             <thead>
               <tr>
                 <th scope="col">Data</th>
                 <th scope="col">Titolo</th>
                 <th scope="col">Fonte</th>
                 <th scope="col">Sommario</th>
+                <th scope="col" class="col-actions-head">
+                  <span class="visually-hidden">Azioni</span>
+                </th>
               </tr>
             </thead>
             <tbody>
-              @for (item of filteredNews(); track item.id) {
+              @for (item of displayedNews(); track item.id) {
                 <tr
                   class="news-row"
+                  [class.news-row--read]="item.read"
                   [class.news-row--no-link]="!hasArticleLink(item)"
                   [attr.role]="hasArticleLink(item) ? 'link' : null"
                   [attr.tabindex]="hasArticleLink(item) ? 0 : -1"
@@ -74,15 +98,40 @@
                   (keydown.space)="$event.preventDefault(); openArticle(item)"
                 >
                   <td class="col-date">{{ item.publishedAt | date: 'dd/MM/yyyy, HH:mm' }}</td>
-                  <td class="col-title">{{ item.title }}</td>
+                  <td class="col-title">
+                    @if (!item.read) {
+                      <span class="unread-dot" aria-hidden="true"></span>
+                    }
+                    {{ item.title }}
+                  </td>
                   <td class="col-feed">{{ feedName(item.feedId) }}</td>
                   <td class="col-summary">{{ item.summary }}</td>
+                  <td class="col-actions">
+                    <button
+                      type="button"
+                      mat-icon-button
+                      class="mark-read-btn"
+                      [matTooltip]="
+                        item.read ? 'Segna come non letta' : 'Segna come letta'
+                      "
+                      [attr.aria-label]="markReadAriaLabel(item)"
+                      [attr.aria-pressed]="!!item.read"
+                      [disabled]="loading()"
+                      (click)="toggleRead(item, $event)"
+                      (keydown.enter)="$event.stopPropagation()"
+                      (keydown.space)="$event.stopPropagation()"
+                    >
+                      <mat-icon>{{
+                        item.read ? 'mark_email_unread' : 'mark_email_read'
+                      }}</mat-icon>
+                    </button>
+                  </td>
                 </tr>
               }
             </tbody>
-          </table>
-        </div>
-      </mat-card>
-    }
-  </section>
+          </app-module-table>
+        </app-module-panel>
+      }
+    </section>
+  </div>
 </div>
