@@ -1,0 +1,16 @@
+<mat-toolbar color="primary" class="app-toolbar">
+  <span class="brand">Control Panel</span>
+  <span class="toolbar-spacer"></span>
+  <nav class="app-nav" aria-label="Sezioni applicazione">
+    <a mat-button routerLink="/training" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
+      Training
+    </a>
+    <a mat-button routerLink="/news" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
+      News
+    </a>
+  </nav>
+</mat-toolbar>
+
+<main class="app-main">
+  <router-outlet />
+</main>
