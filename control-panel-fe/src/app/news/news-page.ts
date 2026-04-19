@@ -6,6 +6,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { firstValueFrom } from 'rxjs';
 import {
   ModulePageHeader,
   ModulePanel,
@@ -13,7 +14,7 @@ import {
   ModuleTable,
 } from '../main/components';
 import { FeedCategory, NewsItem } from './models/news';
-import { NewsDataService } from './services/news-data.service';
+import { NewsService } from './services/news.service';
 
 @Component({
   selector: 'app-news-page',
@@ -35,23 +36,34 @@ import { NewsDataService } from './services/news-data.service';
   standalone: true,
 })
 export class NewsPage {
-  private readonly newsData = inject(NewsDataService);
+  private readonly news = inject(NewsService);
 
-  protected readonly categories = this.newsData.getCategories();
-  protected readonly feedLabels = this.buildFeedLabels();
+  protected readonly categories = signal<FeedCategory[]>([]);
+  protected readonly feedLabels = computed(() => {
+    const map = new Map<number, string>();
+    for (const cat of this.categories()) {
+      for (const f of cat.feeds) {
+        map.set(f.id, f.name);
+      }
+    }
+    return map;
+  });
 
-  protected readonly enabledFeedIds = signal<Set<string>>(this.allFeedIds());
+  protected readonly enabledFeedIds = signal<Set<number>>(new Set());
   protected readonly showOnlyUnread = signal(false);
 
-  // Cache locale della risposta del backend. Lo stato di lettura non vive
-  // sul FE: ogni cambio (filtro o mark read) ricarica la lista dal service.
+  // Cache locale dell'ultima risposta del backend. Il filtro per
+  // feed/categoria è applicato server-side: qui non si filtra più
+  // in memoria, così unreadCount/totalCount restano coerenti col
+  // filtro `onlyUnread` propagato al BE.
   private readonly newsCache = signal<NewsItem[]>([]);
   protected readonly loading = signal(false);
 
-  protected readonly displayedNews = computed(() => {
-    const allowed = this.enabledFeedIds();
-    return this.newsCache().filter((n) => allowed.has(n.feedId));
-  });
+  // Contatore monotono per scartare risposte di richieste superate
+  // (l'utente può cliccare più checkbox in rapida successione).
+  private reloadId = 0;
+
+  protected readonly displayedNews = computed(() => this.newsCache());
 
   protected readonly unreadCount = computed(
     () => this.displayedNews().filter((n) => !n.read).length,
@@ -60,11 +72,11 @@ export class NewsPage {
   protected readonly totalCount = computed(() => this.displayedNews().length);
 
   constructor() {
-    void this.reloadNews();
+    void this.bootstrap();
   }
 
-  protected feedName(feedId: string): string {
-    return this.feedLabels.get(feedId) ?? this.newsData.getFeedNameById(feedId);
+  protected feedName(feedId: number): string {
+    return this.feedLabels().get(feedId) ?? String(feedId);
   }
 
   protected categoryAllEnabled(cat: FeedCategory): boolean {
@@ -76,7 +88,7 @@ export class NewsPage {
     return n > 0 && n < cat.feeds.length;
   }
 
-  protected feedChecked(feedId: string): boolean {
+  protected feedChecked(feedId: number): boolean {
     return this.enabledFeedIds().has(feedId);
   }
 
@@ -89,9 +101,10 @@ export class NewsPage {
       ids.forEach((id) => next.add(id));
     }
     this.enabledFeedIds.set(next);
+    void this.reloadNews();
   }
 
-  protected toggleFeed(feedId: string, checked: boolean): void {
+  protected toggleFeed(feedId: number, checked: boolean): void {
     const next = new Set(this.enabledFeedIds());
     if (checked) {
       next.add(feedId);
@@ -99,6 +112,7 @@ export class NewsPage {
       next.delete(feedId);
     }
     this.enabledFeedIds.set(next);
+    void this.reloadNews();
   }
 
   protected async setShowOnlyUnread(value: boolean): Promise<void> {
@@ -125,7 +139,7 @@ export class NewsPage {
 
   protected async toggleRead(item: NewsItem, event: Event): Promise<void> {
     event.stopPropagation();
-    await this.newsData.markRead(item.id, !item.read);
+    await firstValueFrom(this.news.markRead(item.id, !item.read));
     await this.reloadNews();
   }
 
@@ -133,7 +147,7 @@ export class NewsPage {
     const url = item.externalUrl?.trim();
     if (!url) return;
     if (!item.read) {
-      await this.newsData.markRead(item.id, true);
+      await firstValueFrom(this.news.markRead(item.id, true));
       await this.reloadNews();
     }
     const a = document.createElement('a');
@@ -143,33 +157,86 @@ export class NewsPage {
     a.click();
   }
 
+  /**
+   * Carica le categorie dal BE, abilita di default tutti i feed e
+   * scatena il primo refresh delle news.
+   */
+  private async bootstrap(): Promise<void> {
+    const cats = await firstValueFrom(this.news.getCategories());
+    this.categories.set(cats);
+    const all = new Set<number>();
+    for (const cat of cats) {
+      for (const f of cat.feeds) {
+        all.add(f.id);
+      }
+    }
+    this.enabledFeedIds.set(all);
+    await this.reloadNews();
+  }
+
   private async reloadNews(): Promise<void> {
+    const id = ++this.reloadId;
+
+    // Categorie non ancora caricate o nessun feed selezionato:
+    // lista vuota senza chiamare il BE.
+    if (this.categories().length === 0 || this.enabledFeedIds().size === 0) {
+      this.newsCache.set([]);
+      return;
+    }
+
+    const { categoryIds, feedIds } = this.buildFilter();
+
     this.loading.set(true);
     try {
-      const list = await this.newsData.getNews({ onlyUnread: this.showOnlyUnread() });
+      const list = await firstValueFrom(
+        this.news.getNews({
+          onlyUnread: this.showOnlyUnread(),
+          categoryIds,
+          feedIds,
+        }),
+      );
+      // Scarta risposte arrivate fuori ordine.
+      if (id !== this.reloadId) return;
       this.newsCache.set(list);
     } finally {
-      this.loading.set(false);
+      if (id === this.reloadId) {
+        this.loading.set(false);
+      }
     }
   }
 
-  private allFeedIds(): Set<string> {
-    const ids = new Set<string>();
-    for (const cat of this.categories) {
-      for (const f of cat.feeds) {
-        ids.add(f.id);
-      }
-    }
-    return ids;
-  }
+  /**
+   * Traduce lo stato canonico {@link enabledFeedIds} (granularità: feed)
+   * nella forma più compatta accettata dall'API:
+   * - per ogni categoria interamente selezionata si manda la sola
+   *   `categoryId` (il BE espande sui suoi feed via JOIN);
+   * - per le categorie parzialmente selezionate si mandano i singoli
+   *   `feedIds`;
+   * - se *tutto* è selezionato si omettono entrambi i parametri (= nessun
+   *   filtro per fonte sul BE).
+   */
+  private buildFilter(): { categoryIds?: number[]; feedIds?: number[] } {
+    const categoryIds: number[] = [];
+    const feedIds: number[] = [];
+    let allFull = true;
 
-  private buildFeedLabels(): Map<string, string> {
-    const map = new Map<string, string>();
-    for (const cat of this.categories) {
-      for (const f of cat.feeds) {
-        map.set(f.id, f.name);
+    for (const cat of this.categories()) {
+      if (this.categoryAllEnabled(cat)) {
+        categoryIds.push(cat.id);
+      } else {
+        allFull = false;
+        for (const f of cat.feeds) {
+          if (this.feedChecked(f.id)) {
+            feedIds.push(f.id);
+          }
+        }
       }
     }
-    return map;
+
+    if (allFull) return {};
+    return {
+      categoryIds: categoryIds.length > 0 ? categoryIds : undefined,
+      feedIds: feedIds.length > 0 ? feedIds : undefined,
+    };
   }
 }

@@ -12,7 +12,7 @@
           description="Abilita categorie o singoli feed per filtrare la lista"
           titleId="feed-filter-title"
         />
-        @for (cat of categories; track cat.id) {
+        @for (cat of categories(); track cat.id) {
           <section class="feed-category" [attr.aria-label]="'Categoria ' + cat.name">
             <mat-checkbox
               class="category-check"
