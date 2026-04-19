@@ -1,4 +1,88 @@
-<section class="news-placeholder">
-  <h1>News</h1>
-  <p>Sezione in arrivo per le prossime funzionalità.</p>
-</section>
+<div class="news-layout">
+  <aside class="feed-panel" aria-labelledby="feed-filter-title">
+    <mat-card class="feed-card">
+      <mat-card-header>
+        <mat-card-title id="feed-filter-title">Fonti (feed)</mat-card-title>
+        <mat-card-subtitle>Abilita categorie o singoli feed per filtrare la lista</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        @for (cat of categories; track cat.id) {
+          <section class="feed-category" [attr.aria-label]="'Categoria ' + cat.name">
+            <mat-checkbox
+              class="category-check"
+              [checked]="categoryAllEnabled(cat)"
+              [indeterminate]="categorySomeEnabled(cat)"
+              (change)="toggleCategory(cat)"
+            >
+              {{ cat.name }}
+            </mat-checkbox>
+            <ul class="feed-list">
+              @for (feed of cat.feeds; track feed.id) {
+                <li>
+                  <mat-checkbox
+                    [checked]="feedChecked(feed.id)"
+                    (change)="toggleFeed(feed.id, $event.checked)"
+                  >
+                    {{ feed.name }}
+                  </mat-checkbox>
+                </li>
+              }
+            </ul>
+            @if (!$last) {
+              <mat-divider class="between-categories" />
+            }
+          </section>
+        }
+      </mat-card-content>
+    </mat-card>
+  </aside>
+
+  <section class="news-list-panel" aria-label="Elenco news">
+    <header class="news-list-header">
+      <h1>News</h1>
+      <p class="lede">Articoli dai feed attivi, ordinati per data.</p>
+    </header>
+
+    @if (filteredNews().length === 0) {
+      <mat-card class="empty-card">
+        <mat-card-content>
+          <p>Nessuna news: seleziona almeno un feed nella colonna a sinistra.</p>
+        </mat-card-content>
+      </mat-card>
+    } @else {
+      <mat-card class="table-card">
+        <div class="table-wrap">
+          <table class="news-table">
+            <thead>
+              <tr>
+                <th scope="col">Data</th>
+                <th scope="col">Titolo</th>
+                <th scope="col">Fonte</th>
+                <th scope="col">Sommario</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of filteredNews(); track item.id) {
+                <tr
+                  class="news-row"
+                  [class.news-row--no-link]="!hasArticleLink(item)"
+                  [attr.role]="hasArticleLink(item) ? 'link' : null"
+                  [attr.tabindex]="hasArticleLink(item) ? 0 : -1"
+                  [attr.aria-label]="articleRowAriaLabel(item)"
+                  (click)="openArticle(item)"
+                  (keydown.enter)="openArticle(item)"
+                  (keydown.space)="$event.preventDefault(); openArticle(item)"
+                >
+                  <td class="col-date">{{ item.publishedAt | date: 'dd/MM/yyyy, HH:mm' }}</td>
+                  <td class="col-title">{{ item.title }}</td>
+                  <td class="col-feed">{{ feedName(item.feedId) }}</td>
+                  <td class="col-summary">{{ item.summary }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </mat-card>
+    }
+  </section>
+</div>
