@@ -9,5 +9,6 @@ import lombok.Data;
 public class CreateRecordEntryDTO {
     private String description;
 	private LocalDate recordDate;
-	private BigDecimal value;
+	private BigDecimal amount;
+	private String categoryId;
 }
