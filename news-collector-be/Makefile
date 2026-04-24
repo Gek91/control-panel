@@ -1,4 +1,4 @@
-.PHONY: tidy run run-dev build test lint clean reset-db swagger
+.PHONY: tidy run run-dev build test test-integration test-all test-cover lint clean reset-db swagger
 
 BIN=bin/news-collector-be
 DB_FILE=news.db
@@ -27,7 +27,16 @@ build:
 	go build -o $(BIN) .
 
 test:
-	go test ./...
+	go test -race ./...
+
+test-integration:
+	go test -race -tags=integration ./...
+
+test-all: test-integration
+
+test-cover:
+	go test -race -tags=integration -coverpkg=./... -coverprofile=coverage.out ./...
+	go tool cover -func=coverage.out
 
 lint:
 	go vet ./...

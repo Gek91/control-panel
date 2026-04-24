@@ -75,10 +75,6 @@ func (h *Handler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, items)
 }
 
-// parseIDList interpreta una stringa CSV di interi positivi (es. "1,2,3").
-// Stringa vuota → slice nil (nessun filtro). Elementi duplicati o vuoti
-// vengono ignorati silenziosamente; un valore non parsabile è invece un
-// errore esplicito.
 func parseIDList(raw string) ([]int64, error) {
 	if raw == "" {
 		return nil, nil
