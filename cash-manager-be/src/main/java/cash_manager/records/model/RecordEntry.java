@@ -23,7 +23,7 @@ public class RecordEntry {
 	@Column
 	private String description;
 	private LocalDate recordDate;
-	@Column(name = "`value`")
+	@Column(name = "value")
 	private BigDecimal value;
 	@Column
 	private Instant creationTimestamp;

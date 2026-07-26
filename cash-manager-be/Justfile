@@ -1,0 +1,23 @@
+artifact_id := `sed -n '/<\/parent>/,$s/.*<artifactId>\([^<]*\)<\/artifactId>.*/\1/p' pom.xml | head -1`
+version := `sed -n '/<\/parent>/,$s/.*<version>\([^<]*\)<\/version>.*/\1/p' pom.xml | head -1`
+image := artifact_id + ":" + version
+
+# List available recipes
+default:
+    @just --list
+
+# Compile and package the application
+compile:
+    mvn clean compile package
+
+# Run the application locally
+run:
+    mvn spring-boot:run
+
+# Build the Docker image
+docker-build:
+    docker build -t {{image}} .
+
+# Run the Docker container
+docker-run:
+    docker run --rm -p 8080:8080 {{image}}
