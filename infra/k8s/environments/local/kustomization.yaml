@@ -5,4 +5,4 @@ resources:
   - namespace.yaml
   - ../../apps/cash-manager-be/overlays/local
   - ../../apps/weight-record-be/overlays/local
-  # - ../../apps/news-collector-be/overlays/local
+  - ../../apps/news-collector-be/overlays/local

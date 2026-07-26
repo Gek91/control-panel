@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: news-collector-be
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: news-collector-be
+          # Image is built locally and loaded into minikube (`minikube image load`).
+          imagePullPolicy: Never
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

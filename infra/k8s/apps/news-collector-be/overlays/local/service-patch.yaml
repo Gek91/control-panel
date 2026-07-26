@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: news-collector-be
+spec:
+  # NodePort so the API is reachable via `minikube service news-collector-be`.
+  type: NodePort
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      nodePort: 30082
+      protocol: TCP
