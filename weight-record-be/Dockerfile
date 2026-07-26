@@ -23,13 +23,13 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 FROM python:3.12-slim-bookworm
 WORKDIR /app
 
-RUN groupadd --system app && useradd --system --gid app app
+RUN groupadd --gid 1000 app && useradd --uid 1000 --gid app app
 
-COPY --from=build /build/.venv ./.venv
-COPY --from=build /build/app ./app
-COPY --from=build /build/resources ./resources
-COPY --from=build /build/run.py ./run.py
-COPY --from=build /build/pyproject.toml ./pyproject.toml
+COPY --from=build --chown=app:app /build/.venv ./.venv
+COPY --from=build --chown=app:app /build/app ./app
+COPY --from=build --chown=app:app /build/resources ./resources
+COPY --from=build --chown=app:app /build/run.py ./run.py
+COPY --from=build --chown=app:app /build/pyproject.toml ./pyproject.toml
 
 ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONUNBUFFERED=1

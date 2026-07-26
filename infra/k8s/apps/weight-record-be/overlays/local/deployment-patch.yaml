@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weight-record-be
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: weight-record-be
+          # Image is built locally and loaded into minikube (`minikube image load`).
+          imagePullPolicy: Never
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

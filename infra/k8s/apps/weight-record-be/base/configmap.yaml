@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: weight-record-be
+  labels:
+    app.kubernetes.io/name: weight-record-be
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: control-panel
+data:
+  PORT: "8080"
+  # Default local profile (in-memory SQLite + seed on startup).
+  ENVIRONMENT: local
+  LOGGING_LEVEL: DEBUG
