@@ -40,6 +40,19 @@ kubectl apply -k infra/k8s/environments/local
 | weight-record-be | 30081 | `minikube service weight-record-be -n control-panel` |
 | news-collector-be | 30082 | `minikube service news-collector-be -n control-panel` |
 | control-panel-fe | 30083 | `minikube service control-panel-fe -n control-panel` |
+| postgres | 30432 | `minikube service postgres -n control-panel` |
+
+### PostgreSQL (StatefulSet)
+
+Single small instance with 1 Gi persistent volume.
+
+| | |
+|---|---|
+| Host (in-cluster) | `postgres.control-panel.svc.cluster.local` |
+| Port | `5432` |
+| Database | `controlpanel` |
+| User / password | `controlpanel` / `controlpanel` (local Secret only) |
+
 
 The frontend nginx proxies API traffic inside the cluster:
 
@@ -56,5 +69,6 @@ infra/
 ├── scripts/deploy-local.sh
 └── k8s/
     ├── apps/<service>/{base,overlays/local}
+    ├── data/postgres/{base,overlays/local}
     └── environments/local
 ```

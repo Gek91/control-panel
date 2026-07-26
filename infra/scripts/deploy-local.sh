@@ -30,6 +30,13 @@ services=(
   "control-panel-fe:control-panel-fe:0.0.1"
 )
 
+# Scale down so same-tag image loads can overwrite (IfNotPresent + busy containers otherwise keep the old digest).
+if kubectl get ns control-panel >/dev/null 2>&1; then
+  echo "==> scaling down control-panel deployments for image reload"
+  kubectl scale deploy -n control-panel --all --replicas=0 2>/dev/null || true
+  kubectl wait --for=delete pod -n control-panel --all --timeout=60s 2>/dev/null || true
+fi
+
 for entry in "${services[@]}"; do
   IFS=':' read -r dir image tag <<<"${entry}"
   echo "==> building ${dir} (${image}:${tag})"
@@ -38,7 +45,7 @@ for entry in "${services[@]}"; do
     just docker-build
   )
   echo "==> loading ${image}:${tag} into minikube"
-  minikube image load "${image}:${tag}"
+  minikube image load "${image}:${tag}" --overwrite=true
 done
 
 echo "==> applying local kustomize"
@@ -50,3 +57,4 @@ echo "  cash-manager-be     -> minikube service cash-manager-be -n control-panel
 echo "  weight-record-be    -> minikube service weight-record-be -n control-panel"
 echo "  news-collector-be   -> minikube service news-collector-be -n control-panel"
 echo "  control-panel-fe    -> minikube service control-panel-fe -n control-panel"
+echo "  postgres            -> minikube service postgres -n control-panel"
