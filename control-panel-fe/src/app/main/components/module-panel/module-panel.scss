@@ -1,0 +1,12 @@
+/* La riga flex (.app-mod-content-row) vede come figli gli host dei componenti: il flex va sull'host. */
+:host(.app-mod-col-list) {
+  display: block;
+  flex: 1 1 300px;
+  min-width: min(100%, 260px);
+}
+
+:host(.app-mod-col-wide) {
+  display: block;
+  flex: 2 1 400px;
+  min-width: min(100%, 280px);
+}

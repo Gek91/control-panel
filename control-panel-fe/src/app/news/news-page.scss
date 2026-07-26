@@ -1,15 +1,187 @@
-.news-placeholder {
-  padding: 2rem;
-  max-width: 48rem;
+// Stile condiviso (classi app-mod-*): src/app/main/_module-shell.scss
+
+.news-layout {
+  display: grid;
+  grid-template-columns: minmax(17rem, 22rem) 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  box-sizing: border-box;
+  align-items: start;
 }
 
-h1 {
-  font-size: 2rem;
+.feed-panel {
+  position: sticky;
+  top: 80px;
+}
+
+.feed-panel app-module-panel {
+  display: block;
+}
+
+.feed-category {
+  padding: 0.25rem 0;
+}
+
+.category-check {
   font-weight: 500;
-  margin: 0 0 1rem;
 }
 
-p {
+.feed-list {
+  list-style: none;
+  margin: 0.25rem 0 0.75rem 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.between-categories {
+  margin: 0.75rem 0;
+}
+
+.news-list-panel {
+  min-width: 0;
+}
+
+.news-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding: 0.25rem 0.25rem 0.75rem;
+}
+
+.news-counts {
+  font-size: 0.95rem;
+  color: #333;
+
+  strong {
+    color: #007bff;
+    font-weight: 600;
+  }
+}
+
+.empty-message {
   margin: 0;
-  opacity: 0.85;
+}
+
+.news-table {
+  font-size: 0.9rem;
+}
+
+.news-row {
+  cursor: pointer;
+
+  &:hover {
+    background-color: #e9ecef;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(0, 123, 255, 0.45);
+    outline-offset: -2px;
+  }
+
+  &--no-link {
+    cursor: default;
+
+    &:hover {
+      background-color: transparent;
+    }
+
+    &:focus-visible {
+      outline: none;
+    }
+  }
+
+  &--read {
+    color: #8a8a8a;
+
+    .col-title {
+      font-weight: 400;
+    }
+
+    .col-summary,
+    .col-feed,
+    .col-date {
+      color: #8a8a8a;
+    }
+  }
+}
+
+.col-date {
+  white-space: nowrap;
+  width: 1%;
+  color: #616161;
+}
+
+.col-title {
+  font-weight: 500;
+  min-width: 10rem;
+}
+
+.col-feed {
+  white-space: nowrap;
+  width: 1%;
+}
+
+.col-summary {
+  color: #333;
+  max-width: 28rem;
+}
+
+.col-actions-head,
+.col-actions {
+  width: 1%;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.col-actions {
+  padding: 0 0.25rem;
+}
+
+.mark-read-btn {
+  color: #616161;
+
+  &:hover {
+    color: #007bff;
+  }
+}
+
+.news-row--read .mark-read-btn {
+  color: #007bff;
+}
+
+.unread-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: #007bff;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 900px) {
+  .news-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .feed-panel {
+    position: static;
+  }
 }

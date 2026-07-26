@@ -1,0 +1,214 @@
+definitions:
+  api.HTTPError:
+    properties:
+      error:
+        type: string
+    type: object
+  api.HealthResponse:
+    properties:
+      status:
+        type: string
+      time:
+        type: string
+    type: object
+  feed.CategoryWithFeeds:
+    properties:
+      feeds:
+        items:
+          $ref: '#/definitions/feed.Feed'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  feed.Feed:
+    properties:
+      categoryId:
+        type: integer
+      createdAt:
+        type: string
+      enabled:
+        type: boolean
+      etag:
+        type: string
+      fetchInterval:
+        type: integer
+      id:
+        type: integer
+      lastFetchedAt:
+        type: string
+      lastModified:
+        type: string
+      name:
+        type: string
+      url:
+        type: string
+    type: object
+  feed.FeedCategory:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  news.MarkReadRequest:
+    properties:
+      read:
+        type: boolean
+    type: object
+  news.News:
+    properties:
+      feedId:
+        type: integer
+      fetchedAt:
+        type: string
+      guid:
+        type: string
+      id:
+        type: integer
+      link:
+        type: string
+      publishedAt:
+        type: string
+      read:
+        type: boolean
+      summary:
+        type: string
+      title:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/feeds:
+    get:
+      description: Returns all feed categories, each containing the list of its feeds.
+        Categories with no feeds are included with an empty list.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/feed.CategoryWithFeeds'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      summary: List feeds grouped by category
+      tags:
+      - feeds
+  /api/v1/feeds/categories:
+    get:
+      description: Returns all feed categories (id and name only), ordered by name.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/feed.FeedCategory'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      summary: List feed categories
+      tags:
+      - feeds
+  /api/v1/news:
+    get:
+      description: Returns news optionally filtered by feed(s), category(ies), read
+        state and limit. `feedIds` and `categoryIds` are CSV lists and combine in
+        OR.
+      parameters:
+      - description: Feed IDs (CSV, e.g. 1,2,3)
+        in: query
+        name: feedIds
+        type: string
+      - description: Category IDs (CSV, e.g. 1,2)
+        in: query
+        name: categoryIds
+        type: string
+      - description: Read filter
+        in: query
+        name: read
+        type: boolean
+      - description: Limit (0 = all)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/news.News'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      summary: List news
+      tags:
+      - news
+  /api/v1/news/{id}/read:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: News ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Read flag
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/news.MarkReadRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      summary: Mark news read state
+      tags:
+      - news
+  /health:
+    get:
+      description: Returns service status and current UTC time
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.HealthResponse'
+      summary: Health check
+      tags:
+      - health
+swagger: "2.0"

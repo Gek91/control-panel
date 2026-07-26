@@ -4,13 +4,27 @@ import { Record } from '../../models/record';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Exercise } from '../../models/exercise';
+import {
+  ModuleFilter,
+  ModuleListToolbar,
+  ModulePanel,
+  ModuleTable,
+} from '../../../main/components';
 
 @Component({
   selector: 'app-record-list',
   templateUrl: './record-list.html',
   styleUrls: ['./record-list.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ModuleFilter,
+    ModuleListToolbar,
+    ModulePanel,
+    ModuleTable,
+  ],
   providers: [DatePipe]
 })
 export class RecordListComponent {

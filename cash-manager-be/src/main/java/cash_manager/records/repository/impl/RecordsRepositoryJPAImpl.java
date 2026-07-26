@@ -28,11 +28,12 @@ public class RecordsRepositoryJPAImpl extends BaseJPARepository<RecordEntry> imp
     @Override
     public Optional<RecordEntry> findById(String id) {
         
-        return entityManager.createQuery("SELECT re FROM RecordEntry re WHERE re.id = :id", RecordEntry.class)
-            .setParameter("id", id)
-            .getResultList()
-            .stream()
-            .findFirst();
+        // return entityManager.createQuery("SELECT re FROM RecordEntry re WHERE re.id = :id", RecordEntry.class)
+        //     .setParameter("id", id)
+        //     .getResultList()
+        //     .stream()
+        //     .findFirst();
+        return Optional.ofNullable(entityManager.find(RecordEntry.class, id));
     }
     
 }
