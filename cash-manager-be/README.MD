@@ -1,3 +1,4 @@
+Common tasks are also available via [Just](https://github.com/casey/just) — see `Justfile` (`just --list`).
 
 ### Compile application
 ```bash

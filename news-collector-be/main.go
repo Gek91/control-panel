@@ -17,10 +17,13 @@ import (
 	"news-collector-be/internal/news"
 )
 
+// Set at build time via: go build -ldflags "-X main.version=..."
+var version = "dev"
+
 func setSwaggerInfo(cfg *core.Config) {
 	docs.SwaggerInfo.Host = cfg.BaseURL + ":" + cfg.Port
 	docs.SwaggerInfo.BasePath = "/v1"
-	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Version = version
 	docs.SwaggerInfo.Title = "News Collector API"
 	docs.SwaggerInfo.Description = "REST API for the control panel news service."
 }

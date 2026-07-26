@@ -1,3 +1,5 @@
+Common tasks are also available via [Just](https://github.com/casey/just) — see `Justfile` (`just --list`).
+
 ### Install Dependencies with UV
 ```bash
 uv sync
@@ -8,12 +10,22 @@ uv sync
 uv run run.py
 ```
 
+### Build Docker image
+```bash
+docker build -t weight-record-api:0.0.1 .
+```
+
+### Run Docker container
+```bash
+docker run --rm -p 8080:8080 weight-record-api:0.0.1
+```
+
 ### Running Tests
 
-The test suite lives under `tests/` and is split into:
+The test suite lives under `test/` and is split into:
 
-- `tests/unit/` — service-level tests that exercise repository + service together against an in-memory SQLite database.
-- `tests/integration/` — API tests built on top of FastAPI's `TestClient`, also backed by an in-memory SQLite database.
+- `test/unit/` — service-level tests that exercise repository + service together against an in-memory SQLite database.
+- `test/integration/` — API tests built on top of FastAPI's `TestClient`, also backed by an in-memory SQLite database.
 
 Both layers seed the database from the `resources/test_data.sql` dump through the shared `seed_data` pytest fixture, mirroring how `resources/local_data.sql` is used by the local environment.
 
@@ -24,14 +36,14 @@ uv run pytest
 
 Run only unit or integration tests:
 ```bash
-uv run pytest tests/unit
-uv run pytest tests/integration
+uv run pytest test/unit
+uv run pytest test/integration
 ```
 
 Run a single test file or test case:
 ```bash
-uv run pytest tests/unit/test_exercises.py
-uv run pytest tests/unit/test_exercises.py::TestExercisesService::test_list_exercises_returns_seeded_exercises
+uv run pytest test/unit/test_exercises.py
+uv run pytest test/unit/test_exercises.py::TestExercisesService::test_list_exercises_returns_seeded_exercises
 ```
 
 ### Swagger local url
