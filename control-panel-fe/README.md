@@ -1,59 +1,74 @@
-# WeightRecord
+Common tasks are also available via [Just](https://github.com/casey/just) — see `Justfile` (`just --list`).
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.1.
+## Local development
 
-## Development server
+### Prerequisites
 
-To start a local development server, run:
+Backend services running on the host (default ports):
 
-```bash
-ng serve
-```
+| Service | Port |
+|---|---|
+| cash-manager-be | `8080` |
+| weight-record-be | `8081` |
+| news-collector-be | `8082` |
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Install dependencies
 
 ```bash
-ng generate component component-name
+npm install
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Run the application
 
 ```bash
-ng generate --help
+npm start
+# or: just run
 ```
 
-## Building
+This starts `ng serve` (typically on `http://localhost:4200`). The Angular app calls relative API paths (`/api/cash`, `/api/weight`, `/api/news`); the CLI proxies them to the local backends via `src/proxy.conf.json` (wired in `angular.json` as `proxyConfig`).
 
-To build the project run:
+| Frontend path | Proxied to | Path rewrite |
+|---|---|---|
+| `/api/cash/...` | `http://localhost:8080` | `/api/cash` stripped |
+| `/api/weight/...` | `http://localhost:8081` | `/api/weight` stripped |
+| `/api/news/...` | `http://localhost:8082` | `/api/news` stripped |
+
+Same routing idea as nginx in the container; `proxy.conf.json` is used only by `ng serve`, not in Docker/Kubernetes.
+
+### Build the application
+```bash
+npm run build
+```
+
+## Docker
+
+### Build image
 
 ```bash
-ng build
+docker build -t control-panel-fe:0.0.1 .
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Run container
 
 ```bash
-ng test
+docker run --rm -p 8080:8080 control-panel-fe:0.0.1
 ```
 
-## Running end-to-end tests
+The container serves the static Angular build with nginx (port 8080) and proxies backend APIs:
 
-For end-to-end (e2e) testing, run:
+| Frontend path | Backend service |
+|---|---|
+| `/api/news/...` | `news-collector-be:8080` (prefix stripped) |
+| `/api/cash/...` | `cash-manager-be:8080` (prefix stripped) |
+| `/api/weight/...` | `weight-record-be:8080` (prefix stripped) |
 
-```bash
-ng e2e
-```
+### `docker-entrypoint.sh`
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Container entrypoint that runs before nginx. It:
 
-## Additional Resources
+- creates nginx temp directories under `/tmp` (needed when `/tmp` is an empty volume in Kubernetes)
+- writes a DNS `resolver` from `/etc/resolv.conf` so backend service names are resolved at request time, not at startup
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Version
+
+The app version is defined in `package.json`.

@@ -1,12 +1,10 @@
 /**
  * Environment per la build di produzione (vedi `fileReplacements` in
- * `angular.json`). Per default si assume che il frontend sia servito sotto
- * lo stesso host del backend e quindi venga utilizzato un path relativo.
- *
- * Cambiare `newsApiBaseUrl` per puntare a un'origine specifica
- * (es. `https://api.example.com/api/v1`).
+ * `angular.json`). Path relativi serviti da nginx nello stesso host.
  */
 export const environment = {
   production: true,
-  newsApiBaseUrl: '/api/v1',
+  newsApiBaseUrl: '/api/news/v1',
+  cashApiBaseUrl: '/api/cash',
+  weightApiBaseUrl: '/api/weight',
 };

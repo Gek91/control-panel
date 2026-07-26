@@ -1,6 +1,6 @@
 # Infra
 
-Local Kubernetes (minikube) manifests and helpers for control-panel backends.
+Local Kubernetes (minikube) manifests and helpers for control-panel.
 
 ## Prerequisites
 
@@ -39,6 +39,15 @@ kubectl apply -k infra/k8s/environments/local
 | cash-manager-be | 30080 | `minikube service cash-manager-be -n control-panel` |
 | weight-record-be | 30081 | `minikube service weight-record-be -n control-panel` |
 | news-collector-be | 30082 | `minikube service news-collector-be -n control-panel` |
+| control-panel-fe | 30083 | `minikube service control-panel-fe -n control-panel` |
+
+The frontend nginx proxies API traffic inside the cluster:
+
+| Frontend path | Backend service |
+|---|---|
+| `/api/news/...` | `news-collector-be` |
+| `/api/cash/...` | `cash-manager-be` |
+| `/api/weight/...` | `weight-record-be` |
 
 ## Layout
 

@@ -1,0 +1,24 @@
+artifact_id := `node -p "require('./package.json').name"`
+version := `node -p "require('./package.json').version"`
+image := artifact_id + ":" + version
+
+# List available recipes
+default:
+    @just --list
+
+# Install dependencies and build the application
+compile:
+    npm install
+    npm run build
+
+# Run the application locally
+run:
+    npm start
+
+# Build the Docker image
+docker-build:
+    docker build -t {{image}} .
+
+# Run the Docker container
+docker-run:
+    docker run --rm -p 8080:8080 {{image}}

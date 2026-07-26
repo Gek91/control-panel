@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: control-panel-fe
+spec:
+  # NodePort so the UI is reachable via `minikube service control-panel-fe`.
+  type: NodePort
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      nodePort: 30083
+      protocol: TCP

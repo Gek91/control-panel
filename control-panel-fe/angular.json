@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "weight-record": {
+    "control-panel-fe": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -67,10 +67,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "weight-record:build:production"
+              "buildTarget": "control-panel-fe:build:production"
             },
             "development": {
-              "buildTarget": "weight-record:build:development"
+              "buildTarget": "control-panel-fe:build:development"
             }
           },
           "defaultConfiguration": "development"

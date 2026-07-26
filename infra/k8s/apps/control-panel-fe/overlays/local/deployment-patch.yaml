@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: control-panel-fe
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: control-panel-fe
+          # Image is built locally and loaded into minikube (`minikube image load`).
+          imagePullPolicy: Never
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi

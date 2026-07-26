@@ -27,6 +27,7 @@ services=(
   "cash-manager-be:cash-manager:0.0.1-SNAPSHOT"
   "weight-record-be:weight-record-api:0.0.1"
   "news-collector-be:news-collector-be:0.0.1"
+  "control-panel-fe:control-panel-fe:0.0.1"
 )
 
 for entry in "${services[@]}"; do
@@ -48,3 +49,4 @@ echo "Services (NodePort):"
 echo "  cash-manager-be     -> minikube service cash-manager-be -n control-panel"
 echo "  weight-record-be    -> minikube service weight-record-be -n control-panel"
 echo "  news-collector-be   -> minikube service news-collector-be -n control-panel"
+echo "  control-panel-fe    -> minikube service control-panel-fe -n control-panel"
