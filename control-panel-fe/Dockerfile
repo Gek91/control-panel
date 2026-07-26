@@ -18,7 +18,7 @@ RUN addgroup -g 1000 -S app && adduser -u 1000 -S app -G app \
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY docker-entrypoint.sh /docker-entrypoint.sh
-COPY --from=build --chown=app:app /build/dist/weight-record/browser .
+COPY --from=build --chown=app:app /build/dist/control-panel-fe/browser .
 
 RUN chmod +x /docker-entrypoint.sh
 
