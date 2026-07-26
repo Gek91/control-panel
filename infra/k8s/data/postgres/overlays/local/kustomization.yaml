@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: control-panel
+
+resources:
+  - ../../base
+
+images:
+  - name: postgres
+    newName: postgres
+    newTag: 16-alpine
+
+patches:
+  - path: statefulset-patch.yaml
+  - path: service-patch.yaml

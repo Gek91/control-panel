@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
+  - ../../data/postgres/overlays/local
   - ../../apps/cash-manager-be/overlays/local
   - ../../apps/weight-record-be/overlays/local
   - ../../apps/news-collector-be/overlays/local
