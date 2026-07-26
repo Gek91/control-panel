@@ -1,0 +1,11 @@
+.venv/
+.git/
+.idea/
+.vscode/
+*.md
+.DS_Store
+.pytest_cache/
+__pycache__/
+test/
+*.db
+.env*

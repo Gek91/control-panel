@@ -21,12 +21,12 @@ async def lifespan(app: FastAPI):
         #init local database
         engine = get_engine(configs.database_url, echo=True)
         with engine.connect() as connection:
-            with open('resources/schema.sql') as file:
-                query = text(file.read())
-                connection.execute(query)
-            with open('resources/local_data.sql') as file:
-                query = text(file.read())
-                connection.execute(query)
+            for path in ('resources/schema.sql', 'resources/local_data.sql'):
+                with open(path) as file:
+                    for statement in file.read().split(';'):
+                        statement = statement.strip()
+                        if statement:
+                            connection.execute(text(statement))
             connection.commit()
 
     yield

@@ -44,7 +44,8 @@ class Configs(BaseSettings):
     redoc_url: str = '/public/redoc'
     open_api_url: str = '/openapi.yaml'
     logging_level: Optional[str] = os.environ.get('LOGGING_LEVEL', 'DEBUG')
-    database_url: str = os.environ.get('DATABASE_URL', 'sqlite:///./test.db')
+    #database_url: str = os.environ.get('DATABASE_URL', 'sqlite:///./test.db')#database on local disk -> keeped between runs
+    database_url: str = os.environ.get('DATABASE_URL', 'sqlite://')
 
 
 

@@ -3,7 +3,7 @@
 uv sync
 ```
 
-### Install Dependencies with UV
+### Run the application
 ```bash
 uv run run.py
 ```

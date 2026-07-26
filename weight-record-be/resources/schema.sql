@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS exercises (
-    `id` VARCHAR(10) NOT NULL
+    `id` VARCHAR(10) NOT NULL,
     `name` VARCHAR(255) UNIQUE NOT NULL,
     PRIMARY KEY (`id`)
 );

@@ -9,7 +9,6 @@ dependencies = [
     "fastapi==0.115.12",
     "httpx==0.28.1",
     "mypy==1.15.0",
-    "pytest==8.3.5",
     "uvicorn==0.34.0",
     "pydantic_settings==2.0.3",
     "pydantic",
@@ -20,7 +19,7 @@ dependencies = [
     "iso639-lang==2.6.3",
     "toml==0.10.2",
     "requests==2.32.5",
-    "SQLAlchemy==2.0.44"
+    "SQLAlchemy==2.0.44",
 ]
 
 
@@ -30,3 +29,8 @@ pythonpath = [
 ]
 log_cli = true
 log_cli_level = "DEBUG"
+
+[dependency-groups]
+dev = [
+    "pytest==8.3.5",
+]
