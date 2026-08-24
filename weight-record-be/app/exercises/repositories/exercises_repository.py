@@ -7,7 +7,7 @@ class ExerciseRepository:
         self.session = session
 
 
-   def get_by_id(self, exercise_id: int):
+   def get_by_id(self, exercise_id: str):
       return (
          self.session
          .query(Exercise)

@@ -8,6 +8,7 @@ import { provideRouter } from '@angular/router';
 
 import { environment } from '../environments/environment';
 import { NEWS_API_BASE_URL } from './news/services/news-api.config';
+import { WEIGHT_API_BASE_URL } from './training/services/weight-api.config';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -17,5 +18,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withFetch()),
     { provide: NEWS_API_BASE_URL, useValue: environment.newsApiBaseUrl },
+    { provide: WEIGHT_API_BASE_URL, useValue: environment.weightApiBaseUrl },
   ],
 };

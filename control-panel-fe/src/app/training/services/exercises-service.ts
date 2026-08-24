@@ -1,31 +1,24 @@
-// src/app/services/exercise.service.ts
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable, map } from 'rxjs';
 import { Exercise } from '../models/exercise';
+import { WEIGHT_API_BASE_URL } from './weight-api.config';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExerciseService {
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = inject(WEIGHT_API_BASE_URL);
 
-  // Simula un database con esercizi predefiniti
-  private exercises: Exercise[] = [
-    { id: '1', name: 'Panca Piana' },
-    { id: '2', name: 'Squat' },
-    { id: '3', name: 'Stacco da Terra' },
-    { id: '4', name: 'Panca Inclinata' },
-    { id: '5', name: 'Panca Declinata' },
-    { id: '6', name: 'Spinte con Manubri' },
-    { id: '7', name: 'Remata' },
-    { id: '8', name: 'Trazioni' },
-    { id: '9', name: 'Dip' },
-    { id: '10', name: 'Military Press' }
-  ];
-
-  constructor() { }
-
-  // READ (Tutti gli esercizi)
   getExercises(): Observable<Exercise[]> {
-    return of(this.exercises);
+    return this.http.get<ExerciseDto[]>(`${this.baseUrl}/exercises`).pipe(
+      map((dtos) => dtos.map((dto) => ({ id: dto.id, name: dto.name }))),
+    );
   }
+}
+
+interface ExerciseDto {
+  id: string;
+  name: string;
 }

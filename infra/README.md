@@ -42,6 +42,16 @@ kubectl apply -k infra/k8s/environments/local
 | control-panel-fe | 30083 | `minikube service control-panel-fe -n control-panel` |
 | postgres | 30432 | `minikube service postgres -n control-panel` |
 
+## Minikube dashboard
+
+To inspect the cluster in a web UI (pods, deployments, services, logs):
+
+```bash
+minikube dashboard
+```
+
+Leave the terminal open while using the dashboard; it proxies the UI and stops when the process exits.
+
 ### PostgreSQL (StatefulSet)
 
 Single small instance with 1 Gi persistent volume.

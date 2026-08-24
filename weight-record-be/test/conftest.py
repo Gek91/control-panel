@@ -24,6 +24,7 @@ from app.core.database import BaseModel
 # Importing the model ensures it is registered against ``BaseModel.metadata``
 # before ``create_all`` is executed below.
 from app.exercises.models.exercise import Exercise  # noqa: F401
+from app.records.models.record import Record  # noqa: F401
 
 
 TEST_DATA_SQL = Path(__file__).resolve().parent.parent / "resources" / "test_data.sql"

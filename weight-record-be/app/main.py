@@ -5,7 +5,7 @@ from starlette.middleware.cors import CORSMiddleware
 from .core.logging import get_logger
 from .core.middleware import handle_generic_exception, log_before_request, filter_options_requests
 from contextlib import asynccontextmanager
-from .api.routers import healthz, exercises
+from .api.routers import healthz, exercises, records
 from .core.database import get_engine
 from sqlalchemy import text
 
@@ -91,6 +91,7 @@ def main():
     #Router
     app.include_router(healthz.router)
     app.include_router(exercises.router)
+    app.include_router(records.router)
 
     app_logger.debug('App Initialized.')
 
