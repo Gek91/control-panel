@@ -10,6 +10,11 @@ spec:
         - name: weight-record-be
           # Image is built locally and loaded into minikube (`minikube image load`).
           imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: weight-record-be
+            - secretRef:
+                name: weight-record-be
           resources:
             requests:
               cpu: 50m

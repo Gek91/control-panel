@@ -1,14 +1,11 @@
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy.pool import StaticPool
 
+WEIGHT_RECORD_SCHEMA = "weight_record"
+
 _engines: dict[str, Engine] = {}
-
-
-def _is_sqlite_memory(database_url: str) -> bool:
-    return database_url in ("sqlite://", "sqlite:///:memory:")
 
 
 def get_engine(database_url: str, echo=False) -> Engine:
@@ -16,10 +13,17 @@ def get_engine(database_url: str, echo=False) -> Engine:
     # startup seeding and request sessions.
     if database_url not in _engines:
         kwargs: dict = {"echo": echo}
-        if _is_sqlite_memory(database_url):
-            kwargs["connect_args"] = {"check_same_thread": False}
-            kwargs["poolclass"] = StaticPool
-        _engines[database_url] = create_engine(database_url, **kwargs)
+        if database_url.startswith("sqlite"):
+            if database_url in ("sqlite://", "sqlite:///:memory:"):
+                kwargs["connect_args"] = {"check_same_thread": False}
+                kwargs["poolclass"] = StaticPool
+            engine = create_engine(database_url, **kwargs)
+        else:
+            # Models stay schema-agnostic; qualify as weight_record only on Postgres.
+            engine = create_engine(database_url, **kwargs).execution_options(
+                schema_translate_map={None: WEIGHT_RECORD_SCHEMA}
+            )
+        _engines[database_url] = engine
     return _engines[database_url]
 
 

@@ -8,4 +8,4 @@ class Exercise(BaseModel):
     __tablename__ = "exercises"
 
     id: Mapped[str] = mapped_column(String(10), primary_key=True)
-    name: Mapped[str] = mapped_column(String(20))
+    name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)

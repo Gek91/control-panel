@@ -5,6 +5,7 @@ namespace: control-panel
 
 resources:
   - ../../base
+  - secret.yaml
 
 images:
   - name: weight-record-api
@@ -14,3 +15,4 @@ images:
 patches:
   - path: deployment-patch.yaml
   - path: service-patch.yaml
+  - path: configmap-patch.yaml

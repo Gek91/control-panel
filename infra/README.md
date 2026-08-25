@@ -20,9 +20,12 @@ From the repo root (`control-panel/`):
 The script:
 
 1. starts minikube if needed
-2. builds each service image via `just docker-build`
-3. loads the images into minikube (`minikube image load`)
-4. applies `infra/k8s/environments/local`
+2. scales down deployments if the namespace already exists
+3. builds each service image via `just docker-build`
+4. loads the images into minikube (`minikube image load`)
+5. applies `infra/k8s/environments/local`
+
+Service-specific runtime/DB setup lives in each service’s README.
 
 ## Apply manifests only
 
@@ -63,6 +66,7 @@ Single small instance with 1 Gi persistent volume.
 | Database | `controlpanel` |
 | User / password | `controlpanel` / `controlpanel` (local Secret only) |
 
+How each backend uses this instance (URL, schema, init) is documented in that service’s README.
 
 The frontend nginx proxies API traffic inside the cluster:
 

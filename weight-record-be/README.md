@@ -10,6 +10,12 @@ uv sync
 uv run run.py
 ```
 
+Defaults: `ENVIRONMENT=local`, in-memory SQLite, lifespan applies `resources/schema.sql` + `resources/local_data.sql`.
+
+On minikube (`ENVIRONMENT=local-cluster`), the app uses Postgres via `DATABASE_URL` (Secret in the local k8s overlay) and expects schema `weight_record` to already exist. DDL source of truth is `resources/schema.sql` — apply it yourself into that schema (e.g. `CREATE SCHEMA` + `SET search_path TO weight_record`, then run the file). Not applied by `deploy-local.sh`.
+
+Cluster deploy: see `infra/README.md`.
+
 ### Build Docker image
 ```bash
 docker build -t weight-record-api:0.0.1 .

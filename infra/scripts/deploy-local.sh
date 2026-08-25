@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REPO_ROOT="$(cd "${ROOT}/.." && pwd)"
 K8S_LOCAL="${ROOT}/k8s/environments/local"
+NS=control-panel
 
 if ! command -v minikube >/dev/null 2>&1; then
   echo "minikube is required" >&2
@@ -31,10 +32,10 @@ services=(
 )
 
 # Scale down so same-tag image loads can overwrite (IfNotPresent + busy containers otherwise keep the old digest).
-if kubectl get ns control-panel >/dev/null 2>&1; then
+if kubectl get ns "${NS}" >/dev/null 2>&1; then
   echo "==> scaling down control-panel deployments for image reload"
-  kubectl scale deploy -n control-panel --all --replicas=0 2>/dev/null || true
-  kubectl wait --for=delete pod -n control-panel --all --timeout=60s 2>/dev/null || true
+  kubectl scale deploy -n "${NS}" --all --replicas=0 2>/dev/null || true
+  kubectl wait --for=delete pod -n "${NS}" --all --timeout=60s 2>/dev/null || true
 fi
 
 for entry in "${services[@]}"; do
